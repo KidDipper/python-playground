@@ -41,4 +41,4 @@ if st.session_state.ac_state:
     st.write(f"- **運転モード**： {st.session_state.mode}")
     st.write(f"- **風量**： {st.session_state.fan_speed}")
 else:
-    st.write("### エアコンは **Stop** です。")
+    st.write("### エアコンは **停止中** です。")
