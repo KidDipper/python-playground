@@ -1,0 +1,14 @@
+[project]
+name = "3d-packing-demo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ipywidgets>=8.1.7",
+    "matplotlib>=3.10.3",
+    "numpy>=2.2.5",
+    "plotly>=6.0.1",
+    "pythreejs>=2.4.2",
+    "streamlit>=1.45.0",
+]
