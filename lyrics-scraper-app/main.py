@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import time
 
 def extract_song_info_from_page(song_url, song_title):
     response = requests.get(song_url)
@@ -39,37 +40,48 @@ def extract_song_info_from_page(song_url, song_title):
                 elif label == "編曲":
                     meta_info["arranger"] = value
 
-                label = None  # リセット
+                label = None
 
     return {
         "title": song_title,
         "release_date": meta_info["release_date"],
-        "lyrics": lyrics,
         "lyricist": meta_info["lyricist"],
         "composer": meta_info["composer"],
-        "arranger": meta_info["arranger"]
+        "arranger": meta_info["arranger"],
+        "lyrics": lyrics
     }
 
-def get_first_song_from_artist_page(artist_url):
+def get_all_song_links(artist_url):
     base_url = "https://utaten.com"
     response = requests.get(artist_url)
     soup = BeautifulSoup(response.text, "html.parser")
 
-    song_tag = soup.select_one("p.searchResult__title h3 a")
-    if song_tag:
-        song_title = song_tag.text.strip()
-        song_url = base_url + song_tag["href"]
-        return song_url, song_title
-    return None, None
+    song_tags = soup.select("p.searchResult__title h3 a")
+    song_links = []
+    for tag in song_tags:
+        title = tag.text.strip()
+        url = base_url + tag["href"]
+        song_links.append((url, title))
+    return song_links
 
-# 実行
+# 実行設定
 artist_url = "https://utaten.com/artist/lyric/32175"
-song_url, song_title = get_first_song_from_artist_page(artist_url)
+max_songs = 1  # ← ここを変更することで取得数を調整できます（例：10曲なら10に）
 
-if song_url:
-    song_data = extract_song_info_from_page(song_url, song_title)
-    df = pd.DataFrame([song_data])
-    df.to_csv("lyrics_fixed.csv", index=False, encoding="utf-8-sig")
-    print("CSVに保存しました：lyrics_fixed.csv")
-else:
-    print("曲が見つかりませんでした。")
+songs = get_all_song_links(artist_url)
+total = len(songs)
+num_to_get = min(max_songs, total)
+
+print(f"全{total}曲中、最初の{num_to_get}曲を取得します。\n")
+
+results = []
+for i, (url, title) in enumerate(songs[:num_to_get]):
+    print(f"{num_to_get}曲中 {i+1}曲目: 「{title}」 を取得中...")
+    song_data = extract_song_info_from_page(url, title)
+    results.append(song_data)
+    time.sleep(1)  # サーバー負荷軽減
+
+# CSV保存
+df = pd.DataFrame(results)
+df.to_csv("lyrics_milet.csv", index=False, encoding="utf-8-sig")
+print(f"\n{num_to_get}曲をCSVに保存しました：lyrics_milet.csv")
