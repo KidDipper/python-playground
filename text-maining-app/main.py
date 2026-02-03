@@ -219,7 +219,7 @@ def main() -> None:
             fig, ax = plt.subplots(figsize=(10, 5))
             ax.imshow(wordcloud, interpolation="bilinear")
             ax.axis("off")
-            st.pyplot(fig, use_container_width=True)
+            st.pyplot(fig, width="stretch")
 
             buffer = io.BytesIO()
             fig.savefig(buffer, format="png", bbox_inches="tight", dpi=150)
@@ -233,7 +233,7 @@ def main() -> None:
         with col2:
             st.subheader("Top Keywords")
             df = pd.DataFrame(top_counts, columns=["keyword", "count"])
-            st.dataframe(df, use_container_width=True, height=420)
+            st.dataframe(df, width="stretch", height=420)
             st.download_button(
                 "Download Keywords (CSV)",
                 data=df.to_csv(index=False).encode("utf-8"),
