@@ -100,6 +100,24 @@ def find_font_path(uploaded_font: bytes | None, filename: str | None) -> str | N
             tmp.write(uploaded_font)
             return tmp.name
 
+    repo_dir = Path(__file__).resolve().parent
+    fonts_dir = repo_dir / "fonts"
+    if fonts_dir.exists():
+        preferred = [
+            "NotoSansCJKjp-Regular.otf",
+            "NotoSansJP-Regular.otf",
+            "NotoSerifCJKjp-Regular.otf",
+            "IPAexGothic.ttf",
+            "IPAexMincho.ttf",
+        ]
+        for name in preferred:
+            candidate = fonts_dir / name
+            if candidate.exists():
+                return str(candidate)
+        for candidate in fonts_dir.iterdir():
+            if candidate.suffix.lower() in {".ttf", ".otf", ".ttc"}:
+                return str(candidate)
+
     candidate_paths = [
         "C:/Windows/Fonts/meiryo.ttc",
         "C:/Windows/Fonts/msgothic.ttc",
